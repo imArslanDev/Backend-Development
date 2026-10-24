@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/imArslanDev/Backend-Development#readme",
   "dependencies": {
-    "express": "^5.3.0"
+    "express": "^5.3.0",
+    "nodemon": "^3.1.14"
   }
 }
