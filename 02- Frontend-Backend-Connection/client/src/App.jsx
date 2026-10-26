@@ -6,6 +6,8 @@ function App() {
     const [age, setAge] = useState(null)
     const [city, setCity] = useState(null)
 
+    const URL = `http://localhost:3000/`
+
     // async function fetchData(params) {
     //   let res = await fetch(`http://localhost:3000/`)
     //   let data = res.json()
@@ -20,13 +22,22 @@ function App() {
       .catch(err => console.log(err))
     }
 
+    async function getResponse(params) {
+      axios.post(URL, {
+        username,
+        age,
+        city
+      })
+      
+    }
+
   return (
     <div>
       {/* {data && <div> User name: {data.name}, User age: {data.age}</div>} */}
-      <input type="text" name="" id="" placeholder='username' />
-      <input type="text" name="" id="" placeholder='city' />
-      <input type="text" name="" id="" placeholder='age' />
-      <button onClick={fetchData}>Send</button>
+      <input type="text" name="" id="" placeholder='username' value={username} onChange={(e) => setUsername(e.target.value)} />
+      <input type="text" name="" id="" placeholder='city' value={city} onChange={(e) => setCity(e.target.value)}  />
+      <input type="text" name="" id="" placeholder='age' value={age} onChange={(e) => setAge(e.target.value)}  />
+      <button onClick={getResponse}>Send</button>
     </div>
   )
 }
