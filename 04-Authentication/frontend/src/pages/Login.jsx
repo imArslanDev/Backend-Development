@@ -4,7 +4,7 @@ import axios from "axios";
 import { DataContext } from "../context/UserContext";
 
 function Login() {
-  const { backendURL } = useContext(DataContext);
+  const { backendURL, userData, setUserData, getUserData } = useContext(DataContext);
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
@@ -16,7 +16,7 @@ function Login() {
     e.preventDefault();
     const { email, password } = formData;
     try {
-      let data = await axios.post(
+      let {data} = await axios.post(
         `${backendURL}/login`,
         {
           email,
@@ -24,6 +24,8 @@ function Login() {
         },
         { withCredentials: true },
       );
+      await getUserData()
+      setUserData(data)
 
       console.log("Login Form Data:", data);
 

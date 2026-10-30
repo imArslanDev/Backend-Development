@@ -20,7 +20,8 @@ export const signup = async (req, res) => {
     // Check if user already exist
     let userExist = await User.findOne({ email });
     if (userExist) {
-      if (req.file?.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      if (req.file?.path && fs.existsSync(req.file.path))
+        fs.unlinkSync(req.file.path);
       return res.status(400).json({ message: "User Already exist" });
     }
 
@@ -67,8 +68,6 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "User does not exist" });
     }
 
-
-
     let matchPassword = await bcrypt.compare(password, existUser.password);
 
     if (!matchPassword) {
@@ -95,6 +94,7 @@ export const login = async (req, res) => {
         lastName: existUser.lastName,
         userName: existUser.userName,
         email: existUser.email,
+        profileImage: existUser.profileImage,
       },
     });
   } catch (error) {
@@ -108,5 +108,21 @@ export const logout = async (req, res) => {
     res.status(200).json({ message: "Logout Successfully" });
   } catch (error) {
     return res.status(500).json({ error });
+  }
+};
+
+export const getUserData = async (req, res) => {
+  try {
+    let userID = req.userID;
+    if (!userID) {
+      return res.status(400).json({ message: "UserID is not found" });
+    }
+    let user = await User.findById(userID);
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error });
   }
 };

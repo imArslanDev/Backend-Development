@@ -2,9 +2,10 @@ import { useContext, useState } from "react";
 import ThemeToggle from "../components/ThemeToggle";
 import { DataContext } from "../context/UserContext";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Signup() {
-  const { backendURL } = useContext(DataContext);
+  const { backendURL, setUserData, getUserData } = useContext(DataContext);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -15,6 +16,8 @@ function Signup() {
 
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
+
+  let navigate = useNavigate()
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,12 +47,15 @@ function Signup() {
         formData.append("profileImage", avatarFile)
       }
 
-      let data = await axios.post(
+      let {data} = await axios.post(
         `${backendURL}/signup`, formData,
         { withCredentials: true, 
           headers: {"Content-Type": "multipart/form-data"}
          },
       );
+      await getUserData()
+      setUserData(data)
+      navigate("/")
 
       console.log("Signup Form Data:", data);
 
