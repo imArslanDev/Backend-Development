@@ -1,18 +1,26 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../config/token.js";
+import uploadImageOnCloudinary from "../config/cloudinary.js";
 
 export const signup = async (req, res) => {
   try {
     const { firstName, lastName, userName, email, password } = req.body;
 
     if (!firstName || !lastName || !userName || !email || !password) {
+      if (req.file?.path) fs.unlinkSync(req.file.path);
       return res.status(400).json({ message: "Fill All Details" });
+    }
+
+    let profileImageURL = "";
+    if (req.file) {
+      profileImageURL = await uploadImageOnCloudinary(req.file.path);
     }
 
     // Check if user already exist
     let userExist = await User.findOne({ email });
     if (userExist) {
+      if (req.file?.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
       return res.status(400).json({ message: "User Already exist" });
     }
 
@@ -26,6 +34,7 @@ export const signup = async (req, res) => {
       userName,
       email,
       password: hashedPassword,
+      profileImage: profileImageURL, // Schema mein field honi chahiye
     });
 
     let token;
@@ -57,6 +66,8 @@ export const login = async (req, res) => {
     if (!existUser) {
       return res.status(400).json({ message: "User does not exist" });
     }
+
+
 
     let matchPassword = await bcrypt.compare(password, existUser.password);
 

@@ -12,6 +12,8 @@ function Signup() {
     email: "",
     password: "",
   });
+
+  const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
 
   const handleChange = (e) => {
@@ -21,23 +23,32 @@ function Signup() {
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
-    if (file) setAvatarPreview(URL.createObjectURL(file));
+    if (file) {
+    setAvatarFile(file); // Real file save karein
+    setAvatarPreview(URL.createObjectURL(file)); // Preview ke liye
+  }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { firstName, lastName, userName, email, password } = formData;
     try {
+      let formData = new FormData()
+      formData.append("firstName", firstName)
+      formData.append("lastName", lastName)
+      formData.append("userName", userName)
+      formData.append("email", email)
+      formData.append("password", password)
+      
+      if(avatarPreview) {
+        formData.append("profileImage", avatarFile)
+      }
+
       let data = await axios.post(
-        `${backendURL}/signup`,
-        {
-          firstName,
-          lastName,
-          userName,
-          email,
-          password,
-        },
-        { withCredentials: true },
+        `${backendURL}/signup`, formData,
+        { withCredentials: true, 
+          headers: {"Content-Type": "multipart/form-data"}
+         },
       );
 
       console.log("Signup Form Data:", data);
@@ -50,6 +61,8 @@ function Signup() {
         email: "",
         password: ""
       })
+      setAvatarFile(null)
+      setAvatarPreview(null)
 
     } catch (error) {
       console.log(error.message);
