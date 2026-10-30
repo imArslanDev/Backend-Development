@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import ThemeToggle from "../components/ThemeToggle";
+import axios from "axios";
+import { DataContext } from "../context/UserContext";
 
 function Login() {
+  const { backendURL } = useContext(DataContext);
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
@@ -9,9 +12,29 @@ function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login Form Data:", formData);
+    const { email, password } = formData;
+    try {
+      let data = await axios.post(
+        `${backendURL}/login`,
+        {
+          email,
+          password,
+        },
+        { withCredentials: true },
+      );
+
+      console.log("Login Form Data:", data);
+
+      // Remove the Form
+      setFormData({
+        email: "",
+        password: "",
+      });
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
   };
 
   return (
@@ -54,10 +77,7 @@ function Login() {
 
           <div className="flex justify-between items-center text-sm">
             <label className="text-gray-700 dark:text-gray-300 cursor-pointer flex items-center">
-              <input
-                type="checkbox"
-                className="mr-1.5 rounded labelStyles"
-              />
+              <input type="checkbox" className="mr-1.5 rounded labelStyles" />
               Remember me
             </label>
             {/* <a

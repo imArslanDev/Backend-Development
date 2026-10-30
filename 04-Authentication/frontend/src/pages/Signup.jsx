@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import ThemeToggle from "../components/ThemeToggle";
+import { DataContext } from "../context/UserContext";
+import axios from "axios";
 
 function Signup() {
+  const { backendURL } = useContext(DataContext);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    username: "",
+    userName: "",
     email: "",
     password: "",
   });
@@ -21,9 +24,36 @@ function Signup() {
     if (file) setAvatarPreview(URL.createObjectURL(file));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Signup Form Data:", formData);
+    const { firstName, lastName, userName, email, password } = formData;
+    try {
+      let data = await axios.post(
+        `${backendURL}/signup`,
+        {
+          firstName,
+          lastName,
+          userName,
+          email,
+          password,
+        },
+        { withCredentials: true },
+      );
+
+      console.log("Signup Form Data:", data);
+
+      // Remove the Form
+      setFormData({
+        firstName: "",
+        lastName: "",
+        userName: "",
+        email: "",
+        password: ""
+      })
+
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   return (
@@ -101,12 +131,12 @@ function Signup() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="labelStyles">Username</label>
+            <label className="labelStyles">userName</label>
             <input
               type="text"
-              name="username"
+              name="userName"
               placeholder="johndoe"
-              value={formData.username}
+              value={formData.userName}
               onChange={handleChange}
               required
               className="inputStyles"
@@ -139,10 +169,7 @@ function Signup() {
             />
           </div>
 
-          <button
-            type="submit"
-            className="btnPrimary"
-          >
+          <button type="submit" className="btnPrimary">
             Sign Up
           </button>
         </form>
